@@ -28,6 +28,9 @@ ROOT_DIR = os.path.abspath("../")
 sys.path.append(ROOT_DIR)  # To find local version of the library
 from mrcnn import utils
 
+#VISUALIZATION_MODE = 'boring'
+VISUALIZATION_MODE = 'awesome'
+
 
 ############################################################
 #  Visualization
@@ -83,7 +86,7 @@ def apply_mask(image, mask, color, alpha=0.5):
 
 def display_instances(image, boxes, masks, class_ids, class_names,
                       scores=None, title="",
-                      figsize=(16, 16), ax=None,
+                      figsize=(12, 8), ax=None,
                       show_mask=True, show_bbox=True,
                       colors=None, captions=None):
     """
@@ -116,8 +119,8 @@ def display_instances(image, boxes, masks, class_ids, class_names,
 
     # Show area outside image boundaries.
     height, width = image.shape[:2]
-    ax.set_ylim(height + 10, -10)
-    ax.set_xlim(-10, width + 10)
+    ax.set_ylim(height + 2, -2)
+    ax.set_xlim(-2, width + 2)
     ax.axis('off')
     ax.set_title(title)
 
@@ -150,20 +153,37 @@ def display_instances(image, boxes, masks, class_ids, class_names,
 
         # Mask
         mask = masks[:, :, i]
-        if show_mask:
-            masked_image = apply_mask(masked_image, mask, color)
 
-        # Mask Polygon
-        # Pad to ensure proper polygons for masks that touch image edges.
-        padded_mask = np.zeros(
-            (mask.shape[0] + 2, mask.shape[1] + 2), dtype=np.uint8)
-        padded_mask[1:-1, 1:-1] = mask
-        contours = find_contours(padded_mask, 0.5)
-        for verts in contours:
-            # Subtract the padding and flip (y, x) to (x, y)
-            verts = np.fliplr(verts) - 1
-            p = Polygon(verts, facecolor="none", edgecolor=color)
-            ax.add_patch(p)
+        if VISUALIZATION_MODE == 'boring':
+            if show_mask:
+                masked_image = apply_mask(masked_image, mask, color)
+
+            # Mask Polygon
+            # Pad to ensure proper polygons for masks that touch image edges.
+            padded_mask = np.zeros(
+                (mask.shape[0] + 2, mask.shape[1] + 2), dtype=np.uint8)
+            padded_mask[1:-1, 1:-1] = mask
+            contours = find_contours(padded_mask, 0.5)
+            for verts in contours:
+                # Subtract the padding and flip (y, x) to (x, y)
+                verts = np.fliplr(verts) - 1
+                p = Polygon(verts, facecolor="none", edgecolor=color)
+                ax.add_patch(p)
+        else:
+            # Dilate and subtract to create a corona effect
+            from scipy.ndimage.filters import gaussian_filter
+            mask = mask.astype(float)
+            dilated = gaussian_filter(mask, sigma=width/40)
+            corona = np.clip(dilated - mask, 0, 1)
+            corona = gaussian_filter(corona, sigma=width/100)
+            corona *= 1.1
+            corona = np.expand_dims(corona, -1)
+            corona = np.tile(corona, 3)
+            corona *= 255
+            masked_image = np.clip(masked_image - corona, 0, 255)
+            corona *= color
+            masked_image = np.clip(masked_image + corona, 0, 255)
+
     ax.imshow(masked_image.astype(np.uint8))
     if auto_show:
         plt.show()
