@@ -27,8 +27,8 @@ ROOT_DIR = os.path.abspath("../")
 sys.path.append(ROOT_DIR)  # To find local version of the library
 from mrcnn import utils
 
-#VISUALIZATION_MODE = 'boring'
-VISUALIZATION_MODE = 'awesome'
+VISUALIZATION_MODE = 'boring'
+#VISUALIZATION_MODE = 'awesome'
 
 
 ############################################################
