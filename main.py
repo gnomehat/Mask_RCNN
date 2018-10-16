@@ -29,7 +29,7 @@ def load_images(input_dir):
     # Load all images from the input folder
     filenames = [os.path.join(input_dir, f) for f in os.listdir(input_dir)]
     print('Found {} input files in directory {}'.format(len(filenames), input_dir))
-    images = [imutil.load(f, resize_to=(800,600)) for f in filenames]
+    images = [imutil.load(f, resize_to=(512,512)) for f in filenames]
     return images
 
 
