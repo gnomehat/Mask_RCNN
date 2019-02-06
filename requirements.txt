@@ -11,3 +11,4 @@ h5py
 imgaug
 IPython[all]
 git+https://github.com/lwneal/imutil
+pycocotools
