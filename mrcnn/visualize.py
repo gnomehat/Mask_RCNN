@@ -118,8 +118,8 @@ def display_instances(image, boxes, masks, class_ids, class_names,
 
     # Show area outside image boundaries.
     height, width = image.shape[:2]
-    ax.set_ylim(height + 2, -2)
-    ax.set_xlim(-2, width + 2)
+    ax.set_ylim(height + .1, -.1)
+    ax.set_xlim(-.1, width + .1)
     ax.axis('off')
     ax.set_title(title)
 

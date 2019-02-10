@@ -28,8 +28,9 @@ def load_images(input_dir):
     import imutil
     # Load all images from the input folder
     filenames = [os.path.join(input_dir, f) for f in os.listdir(input_dir)]
+    filenames = sorted(filenames)
     print('Found {} input files in directory {}'.format(len(filenames), input_dir))
-    images = [imutil.load(f, resize_to=(512,512)) for f in filenames]
+    images = [imutil.load(f, resize_to=(540, 960)) for f in filenames]
     return images
 
 
@@ -74,9 +75,10 @@ def output_results(images, results, output_dir='output'):
     for i in range(len(images)):
         r = results[i]
         image = images[i]
+        colors = visualize.random_colors(1) * 100
         plot = visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
-                                    coco.class_names, r['scores'])
-        output_filename = '{}/output_{:02d}.jpg'.format(output_dir, i)
+                                    coco.class_names, r['scores'], colors=colors)
+        output_filename = '{}/output_{:04d}.jpg'.format(output_dir, i)
         print("Saving {}".format(output_filename))
         plot.savefig(output_filename)
 
